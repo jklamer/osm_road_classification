@@ -9,6 +9,10 @@ class ElementHandler(xml.ContentHandler):
 		self.elementsProcessed+=1
 		if tag == 'node':
 			print('id' in attr)
+
+
+
+
 		if self.elementsProcessed>100:
 			exit()
 	def endElement(self, tag):
@@ -20,31 +24,44 @@ class OsmMap:
 	def __init__(self):
 		self.nodes = dict()
 		self.ways = dict()
-		self.relations= dict()
+		self.relations= set()
 
 	def addNode(self, node):
 		if not isinstance(node, OsmNode):
 			raise Exception("Must add OsmNode as Node")
-		self.nodes[node.id] = node
+		if node not in self.nodes:
+			self.nodes[node]=[]
+
 
 	def addWay(self, way):
 		if not isinstance(way, OsmWay):
 			raise Exception("Must add OsmWay as way")
-		self.way[way.id] = way
+		if way not in self.ways:
+			self.way[way] = []
+			# in order to go grom way to nodes to the other connected ways
+			for nd in way.nodes:
+				self.nodes[nd].append(way.id)
 
 	def addRelation(self, relation):
 		if not isinstance(relation, OsmRelation ):
 			raise Exception("Must add OsmRelation as Relation")
-		self.relations[relation.id] = relation
+		if relation not in self.relations:
+			self.relations.add(relation)
 
 
 
 class OsmNode:
-	def __init__(self, id, lat, lon):
-		self.id = int(id)
-		self.lat = float(lat)
-		self.long = float(lon)
+	def __init__(self, id=None, lat=None, lon=None):
+		if not (id == None or lat == None or lon == None):
+			self.id = int(id)
+			self.lat = float(lat)
+			self.long = float(lon)
+		else:
+			self.id = None
+			self.lat = None
+			self.lon = None
 		self.tags = dict()
+
 	def __hash__(self):
 		return hash(self.id)
 
@@ -53,11 +70,19 @@ class OsmNode:
 			return self.id==other.id
 		return self.id == other
 
+	def is_empty(self):
+		return id != None and lat != None and lon != None
+
+	def defineNode(self, id, lat, lon):
+		self.id = id
+		self.lat = lat
+		self.lon = lon
+
 	def getCoord(self):
 		return self.lat, self.lon
 
 	def addTag(self, k, v):
-		self.tags[k]=v
+		self.tags[k] = v
 
 class OsmWay:
 	def __init__(self, id):
@@ -70,7 +95,7 @@ class OsmWay:
 
 	def __eq__(self, other):
 		if isinstance(other, OsmWay):
-			return self.id==other.id
+			return self.id == other.id
 		return self.id == other
 
 	def addTag(self, k, v):
@@ -94,4 +119,7 @@ class OsmRelation:
 		return self.id == other
 
 	def addTag(self, k, v):
-		self.tags[k]=v
+		self.tags[k] = v
+
+	def addMember(self, mtype, ref, role):
+		self.members[(mtype, ref)] = role
