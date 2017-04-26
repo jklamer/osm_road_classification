@@ -23,19 +23,19 @@ class OsmMap:
 		self.relations= dict()
 
 	def addNode(self, node):
-		if not isinstance(OsmNode, node):
+		if not isinstance(node, OsmNode):
 			raise Exception("Must add OsmNode as Node")
-		self.nodes[node.id]=node
+		self.nodes[node.id] = node
 
 	def addWay(self, way):
-		if not isinstance(OsmWay, way):
+		if not isinstance(way, OsmWay):
 			raise Exception("Must add OsmWay as way")
-		self.way[way.id]=way
+		self.way[way.id] = way
 
 	def addRelation(self, relation):
-		if not isinstance(OsmRelation, relation):
+		if not isinstance(relation, OsmRelation ):
 			raise Exception("Must add OsmRelation as Relation")
-		self.relations[relation.id]=relation
+		self.relations[relation.id] = relation
 
 
 
@@ -45,15 +45,19 @@ class OsmNode:
 		self.lat = float(lat)
 		self.long = float(lon)
 		self.tags = dict()
-
-	def getCoord(self):
-		return self.lat, self.lon
-
 	def __hash__(self):
 		return hash(self.id)
 
 	def __eq__(self, other):
-		return self.id ==  other.id
+		if isinstance(other, OsmNode):
+			return self.id==other.id
+		return self.id == other
+
+	def getCoord(self):
+		return self.lat, self.lon
+
+	def addTag(self, k, v):
+		self.tags[k]=v
 
 class OsmWay:
 	def __init__(self, id):
@@ -65,7 +69,15 @@ class OsmWay:
 		return hash(self.id)
 
 	def __eq__(self, other):
-		return self.id ==  other.id
+		if isinstance(other, OsmWay):
+			return self.id==other.id
+		return self.id == other
+
+	def addTag(self, k, v):
+		self.tags[k]=v
+
+	def addNode(self, nodeId):
+		self.nodes.append(nodeId)
 
 class OsmRelation:
 	def __init__(self, id):
@@ -77,4 +89,9 @@ class OsmRelation:
 		return hash(self.id)
 
 	def __eq__(self, other):
-		return self.id ==  other.id
+		if isinstance(other, OsmRelation):
+			return self.id == other.id
+		return self.id == other
+
+	def addTag(self, k, v):
+		self.tags[k]=v
