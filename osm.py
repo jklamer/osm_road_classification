@@ -150,7 +150,7 @@ class OsmWay:
 		self.tags[k] = v
 
 	def addNode(self, nodeId):
-		self.nodes.append(nodeId)
+		self.nodes.append(int(nodeId))
 
 class OsmRelation:
 	def __init__(self, id=0):
@@ -174,4 +174,4 @@ class OsmRelation:
 		self.tags[k] = v
 
 	def addMember(self, mtype, ref, role):
-		self.members[(mtype, ref)] = role
+		self.members[(mtype, int(ref))] = role

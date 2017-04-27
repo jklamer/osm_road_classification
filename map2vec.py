@@ -2,7 +2,7 @@ import sys
 import xml.sax as xml
 from xml.etree.ElementTree import Element, SubElement, Comment, tostring
 import datetime
-from utility import *
+from osm import *
 
 
 
@@ -17,4 +17,4 @@ if __name__ == "__main__":
 	myHandler = OsmDataContentHandler(map)
 	MapParser.setContentHandler(myHandler)
 	MapParser.parse(open("data/reykjavik_iceland.osm"))
-	map.printMap(file="reykjavik_iceland.txt")
+	map.printMap(file = open("reykjavik_iceland.txt",'w'))
