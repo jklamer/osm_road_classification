@@ -69,7 +69,7 @@ class OsmDataContentHandler(xml.ContentHandler):
 			self.currentElement = None
 			self.currentElementObject = None
 
-	##this shouldnt be needed
+	##this shouldnt be needed if properly formatted osm xml
 	def characters(self, content):
 		pass
 
