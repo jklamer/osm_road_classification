@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
 	#create specific handler for each map
 	map = OsmMap()
-	myHandler = OsmDataContentHandler(map)
+	myHandler = OsmDataContentHandler(map, wayRequireTags=['highway'])
 	MapParser.setContentHandler(myHandler)
 	MapParser.parse(open("data/reykjavik_iceland.osm"))
 	map.printMap(file = open("reykjavik_iceland.txt",'w'))

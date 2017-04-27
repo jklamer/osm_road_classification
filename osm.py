@@ -3,10 +3,18 @@
 import xml.sax as xml
 
 class OsmDataContentHandler(xml.ContentHandler):
-	def __init__(self, map):
+	def __init__(self, map, nodeRequireTags = [], nodeProhibitTags = [], wayRequireTags= [] , wayProhibitTags=[], relationRequireTags = [], relationProhibitTags=[]):
 		self.elementsProcessed = 0
 		self.currentElement = None
 		self.currentElementObject = None
+		#a list of mandatory or required tags for nodes, ways, and relations
+		self.nodeRequireTags=nodeRequireTags
+		self.nodeProhibitTags=nodeProhibitTags
+		self.wayRequireTags = wayRequireTags
+		self.wayProhibitTags = wayProhibitTags
+		self.relationRequireTags = relationRequireTags
+		self.relationProhibitTags = relationProhibitTags
+
 		if not isinstance(map, OsmMap):
 			raise Exception("Cannot initialize ContentHandler with type {}, must be OsmMap".format(type(map)))
 		self.map = map
@@ -35,7 +43,28 @@ class OsmDataContentHandler(xml.ContentHandler):
 			self.currentElementObject.addMember(attr['type'], attr['ref'], attr['role'])
 
 	def endElement(self, tag):
-		if tag in ['node','way','relation']:
+		if tag not in ['node','way','relation']:
+			return
+
+		if tag =='node':
+			requiredSet=set(self.nodeRequireTags)
+			prohibitList=self.nodeProhibitTags
+		if tag == 'way':
+			requiredSet=set(self.wayRequireTags)
+			prohibitList=self.wayProhibitTags
+		if tag == 'relation':
+			requiredSet=set(self.relationRequireTags)
+			prohibitList=self.relationProhibitTags
+
+		#choosing what gets added to map based on having tags or not
+		for maptag in self.currentElementObject.tags.keys():
+			if maptag in prohibitList:
+				return
+			elif maptag in requiredSet:
+				requiredSet.remove(maptag)
+
+		#if all the required tags are there
+		if not len(requiredSet):
 			self.map.add(self.currentElementObject)
 			self.currentElement = None
 			self.currentElementObject = None
@@ -143,6 +172,7 @@ class OsmWay:
 		if isinstance(other, OsmWay):
 			return self.id == other.id
 		return self.id == other
+
 	def __str__(self):
 		return "Way #{}\n    Nodes:{}\n    Tags:{}".format(self.id,self.nodes,self.tags)
 
