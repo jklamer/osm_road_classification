@@ -74,10 +74,16 @@ class OsmDataContentHandler(xml.ContentHandler):
 		pass
 
 class OsmMap:
-	def __init__(self):
+	def __init__(self, includeNodes=True, includeWays=True, includeRelations=True):
 		self.nodes = dict()
 		self.ways = dict()
 		self.relations= set()
+		self.nodeString='node'
+		self.wayString='way'
+		self.relationString='relation'
+		self.includeNodes=includeNodes
+		self.includeWays=includeWays
+		self.includeRelations=includeRelations
 
 	def printMap(self, file=None):
 		for node in self.nodes.keys():
@@ -89,13 +95,16 @@ class OsmMap:
 
 	def add(self, element):
 		if isinstance(element, OsmNode):
-			self.addNode(element)
+			if self.includeNodes:
+				self.addNode(element)
 			return
 		if isinstance(element, OsmWay):
-			self.addWay(element)
+			if self.includeWays:
+				self.addWay(element)
 			return
 		if isinstance(element, OsmRelation):
-			self.addRelation(element)
+			if self.includeRelations:
+				self.addRelation(element)
 			return
 		raise Exception("{} is not an OSM element".format(type(element)))
 
@@ -103,22 +112,29 @@ class OsmMap:
 		if not isinstance(node, OsmNode):
 			raise Exception("Must add OsmNode as node")
 		if node not in self.nodes:
-			self.nodes[node]=[]
+			self.nodes[node.id]=node
 
 	def addWay(self, way):
 		if not isinstance(way, OsmWay):
 			raise Exception("Must add OsmWay as way")
 		if way not in self.ways:
-			self.ways[way] = []
+			self.ways[way.id] = way
 			# in order to go grom way to nodes to the other connected ways
 			for nd in way.nodes:
-				self.nodes[nd].append(way.id)
+				self.nodes[nd].addSuperStruct(way.id,self.wayString)
+
 
 	def addRelation(self, relation):
 		if not isinstance(relation, OsmRelation ):
 			raise Exception("Must add OsmRelation as relation")
 		if relation not in self.relations:
 			self.relations.add(relation)
+			for structtype , id in relation.members.keys():
+				if structtype == self.nodeString:
+					self.nodes[id].addSuperStruct(relation.id, self.relationString)
+				if structtype == self.wayString:
+					self.ways[id].addSuperStruct(relation.id, self.relationString)
+
 
 
 
@@ -133,6 +149,7 @@ class OsmNode:
 			self.lat = None
 			self.lon = None
 		self.tags = dict()
+		self.superStructs = dict()
 
 	def __hash__(self):
 		return hash(self.id)
@@ -159,11 +176,17 @@ class OsmNode:
 	def addTag(self, k, v):
 		self.tags[k] = v
 
+	def addSuperStruct(self, id, structtype):
+		if structtype not in self.superStructs:
+			self.superStructs[structtype]=[]
+		self.superStructs[structtype].append(id)
+
 class OsmWay:
 	def __init__(self, id=0):
 		self.id = int(id)
 		self.nodes = list()
 		self.tags = dict()
+		self.superStructs = dict()
 
 	def __hash__(self):
 		return hash(self.id)
@@ -181,6 +204,11 @@ class OsmWay:
 
 	def addNode(self, nodeId):
 		self.nodes.append(int(nodeId))
+
+	def addSuperStruct(self, id, structtype):
+		if structtype not in self.superStructs:
+			self.superStructs[structtype]=[]
+		self.superStructs[structtype].append(id)
 
 class OsmRelation:
 	def __init__(self, id=0):

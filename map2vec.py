@@ -5,7 +5,7 @@ import datetime
 from osm import *
 usage="USAGE: map2vec.py INPUTS -o OUTPUTS"
 
-if len(sys.argv)== 1 or sys.argv[1] == '-h' or sys.argv[1]=='--help':
+if len(sys.argv)== 1 or sys.argv[1] == '-h' or sys.argv[1] == '--help':
 	print(usage)
 	exit()
 
@@ -33,7 +33,7 @@ if __name__ == "__main__":
 
 	for i in range(len(inputs)):
 		#create specific handler for each map
-		map = OsmMap()
+		map = OsmMap(includeRelations=False)
 		myHandler = OsmDataContentHandler(map, wayRequireTags=['highway'])
 		MapParser.setContentHandler(myHandler)
 		MapParser.parse(open(inputs[i]))
