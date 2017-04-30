@@ -37,6 +37,17 @@ if __name__ == "__main__":
 		myHandler = OsmDataContentHandler(map, wayRequireTags=['highway'])
 		MapParser.setContentHandler(myHandler)
 		MapParser.parse(open(inputs[i]))
-		map.printMap(file = open(outputs[i],'w'))
+		# #map.printMap(file = open(outputs[i],'w'))
+		# classCounts={}
+		# for way in map.ways.keys():
+		# 	klass = way.tags['highway']
+		# 	if klass not in classCounts:
+		# 		classCounts[klass] = 0
+		# 	classCounts[klass] += 1
+
+
+		# print(inputs[i])
+		# for roadType in sorted(list(classCounts.keys())):
+		# 	print("{}: {}".format(roadType, classCounts[roadType]))
 
 		del(map)
