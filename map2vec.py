@@ -44,12 +44,20 @@ if __name__ == "__main__":
 
 
 		# #map.printMap(file = open(outputs[i],'w'))
-		# classCounts={}
-		# for way in map.ways.keys():
-		# 	klass = way.tags['highway']
-		# 	if klass not in classCounts:
-		# 		classCounts[klass] = 0
-		# 	classCounts[klass] += 1
+		classCounts={}
+		for way in map.ways.values():
+			klass = way.tags['highway']
+			if klass in {"motorway","trunk","primary","secondary","tertiary","unclassified","residential","service"}:	
+				if klass not in classCounts:
+					classCounts[klass] = 0
+				classCounts[klass] += 1
+
+		total=sum(classCounts.values())
+		for k in classCounts.keys():
+			classCounts[k]= classCounts[k]/total
+
+		print(classCounts)
+
 
 
 		# print(inputs[i])
