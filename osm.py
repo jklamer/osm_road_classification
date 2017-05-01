@@ -121,7 +121,7 @@ class OsmMap:
 			self.ways[way.id] = way
 			# in order to go grom way to nodes to the other connected ways
 			for nd in way.nodes:
-				self.nodes[nd].addSuperStruct(way.id,self.wayString)
+				self.nodes[nd].addSuperStruct(way.id, self.wayString)
 
 
 	def addRelation(self, relation):
@@ -178,7 +178,7 @@ class OsmNode:
 
 	def addSuperStruct(self, id, structtype):
 		if structtype not in self.superStructs:
-			self.superStructs[structtype]=[]
+			self.superStructs[structtype] = []
 		self.superStructs[structtype].append(id)
 
 class OsmWay:

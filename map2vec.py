@@ -3,6 +3,8 @@ import xml.sax as xml
 from xml.etree.ElementTree import Element, SubElement, Comment, tostring
 import datetime
 from osm import *
+import vectorizers
+
 usage="USAGE: map2vec.py INPUTS -o OUTPUTS"
 
 if len(sys.argv)== 1 or sys.argv[1] == '-h' or sys.argv[1] == '--help':
@@ -37,6 +39,10 @@ if __name__ == "__main__":
 		myHandler = OsmDataContentHandler(map, wayRequireTags=['highway'])
 		MapParser.setContentHandler(myHandler)
 		MapParser.parse(open(inputs[i]))
+
+		vectorizers.mapVectorize1(map, open(outputs[i],'w'))
+
+
 		# #map.printMap(file = open(outputs[i],'w'))
 		# classCounts={}
 		# for way in map.ways.keys():
