@@ -48,8 +48,12 @@ for arg in sys.argv[1:]:
     y = y.values.reshape((n_instances, 1))
     y_hot= label_binarize(y)
 
+
     model = Sequential()
-    model.add(Dense(10, activation='relu', input_dim = n_features))
+    model.add(Dense(800, activation='relu', input_dim = n_features))
+    model.add(Dense(400, activation='relu'))
+    model.add(Dense(200, activation='relu'))
+    model.add(Dense(100, activation='relu'))
     model.add(Dense(len(classes), activation='softmax'))
     model.compile(optimizer='rmsprop',
                   loss='categorical_crossentropy',

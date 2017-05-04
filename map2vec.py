@@ -40,7 +40,7 @@ if __name__ == "__main__":
 		MapParser.setContentHandler(myHandler)
 		MapParser.parse(open(inputs[i]))
 
-		vectorizers.mapVectorize1(map, open(outputs[i],'w'))
+		vectorizers.mapVectorize2(map, open(outputs[i],'w'))
 
 
 		# #map.printMap(file = open(outputs[i],'w'))
