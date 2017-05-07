@@ -121,8 +121,8 @@ def mapVectorize1(map, csvfile):
 
 
 def mapVectorize2(map, csvfile):
-    n_dim = 20
-    fieldNames=["numNodes","firstLastDist","avgDistance","stdDistance","firstLastSlope","avgSlope","stdSlope","prctNodeConnected","prctNodeUnique","connectWaysZeroDegree","connectWaysOneDegree"]
+    n_dim = 10
+    fieldNames=["numNodes","firstLastDist","avgDistance","stdDistance","firstLastSlope","avgSlope","stdSlope","prctNodeConnected","prctNodeUnique","connectWaysZeroDegree","connectWaysOneDegree","scale"]
 
     for coordField in range(n_dim ** 2):
         fieldNames.append(str((int(coordField/n_dim), coordField % n_dim)))
@@ -194,6 +194,8 @@ def mapVectorize2(map, csvfile):
         latRange= (maxLat - minLat)
         lonRange= (maxLon - minLon)
         overallRange = max(latRange, lonRange)
+        if overallRange == 0:
+            continue #one point in a million
         def convertToGrid(latlon):
             gridLat = round((latlon[0] - minLat) * n_dim / overallRange)
             gridLon = round((latlon[1] - minLon) * n_dim / overallRange)
@@ -241,6 +243,7 @@ def mapVectorize2(map, csvfile):
         row["prctNodeUnique"] = pctUnique
         row["connectWaysZeroDegree"] = connectWays0Degree
         row["connectWaysOneDegree"] = connectWays1Degree
+        row["scale"] = overallRange
         row["Class"] = way.tags["highway"]
 
 

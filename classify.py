@@ -4,6 +4,8 @@ import keras
 import numpy as np
 import pandas as pd
 import sys
+from keras.optimizers import SGD
+
 
 classes={"motorway","trunk","primary","secondary","tertiary","unclassified","residential","service"}
 
@@ -37,6 +39,19 @@ def label_binarize(y):
 
     return y_bin
 
+def getClassWeights(y_bin):
+    n_instances , n_class = np.shape(y_bin)
+    classWeights = {}
+    for i in range(n_class):
+        classWeights[i] = np.mean(y_bin[:,i])
+
+    for k in classWeights.keys():
+        classWeights[k]= min(1 / classWeights[k], 20)
+
+    return classWeights
+
+
+
 
 for arg in sys.argv[1:]:
     df = pd.read_csv(arg)
@@ -48,18 +63,19 @@ for arg in sys.argv[1:]:
     y = y.values.reshape((n_instances, 1))
     y_hot= label_binarize(y)
 
-
+    activationStr = 'relu'
     model = Sequential()
-    model.add(Dense(800, activation='relu', input_dim = n_features))
-    model.add(Dense(400, activation='relu'))
-    model.add(Dense(200, activation='relu'))
-    model.add(Dense(100, activation='relu'))
+    model.add(Dense(800, activation = activationStr, input_dim = n_features))
+    model.add(Dense(400, activation = activationStr))
+    model.add(Dense(200, activation = activationStr))
+    model.add(Dense(100, activation = activationStr))
     model.add(Dense(len(classes), activation='softmax'))
-    model.compile(optimizer='rmsprop',
+    sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+    model.compile(optimizer = sgd,
                   loss='categorical_crossentropy',
                   metrics=['accuracy'])
 
-    model.fit(X, y_hot, epochs=5, batch_size = 50)
+    model.fit(X, y_hot, epochs=5, batch_size = 100)#, class_weight=getClassWeights(y_hot))
 
     score = model.evaluate(X, y_hot, batch_size = 50)
     print("\nScore:{}".format(score))
